@@ -1,0 +1,66 @@
+showMenu(){
+
+echo "----------------"
+echo "    menu"
+echo "----------------"
+echo "[1] Search DB"
+echo "[2] Create a new DB"
+echo "[3] Delete a DB"
+echo "[4] Create backup of a DB"
+echo "[5] Restore a DB into another DB"
+echo "[6] Exit"
+echo "----------------"
+
+read -p "Please Select A Number: " num
+#return $num
+}
+
+
+while [[ "$num" != "6" ]]
+do
+    if [[ "$num" == "1" ]]; then
+        {
+                 read -p  "Enter DB name  : " db_name
+                  mysql -uroot -p -e "show databases" | grep -i $db_name
+        }
+    elif [[ "$num" == "2" ]]; then
+        {
+                read -p "Enter the Name of DB: "  create_db
+                mysql -uroot -p -sBe "create database  $create_db;"
+                sleep 0.8
+                echo "data base created"
+        }
+
+    elif [[ "$num" == "3" ]]; then
+        {
+                read -p "Enter the Name of DB: "  dlt_db
+                mysql -uroot -p -sBe "drop database  $dlt_db;"
+                sleep 0.8
+                echo "data base deleted"
+        }
+
+    elif [[ "$num" == "4" ]]; then
+        {
+                read -p "Enter the Name of DB: "  bkp_db
+                read -p "Enter Username: " user_name
+                mysqldump -uroot -p  $bkp_db > /home/$user_name/$bkp_db.sql
+                sleep 0.8
+                echo "data base backup in /home/$user_name/$bkp_db.sql"
+        }
+
+    elif [[ "$num" == "5" ]]; then
+       {
+                read -p "Enter the target DB name : "  trg_db
+                read -p "Enter the source DB name : " src_db
+                mysqldump -h localhost -uusername -ppassword $src_db | mysql -h localhost -uusername  -ppassword $trg_db
+                #mysqldump -uroot -p  $bkp_db > /home/$user_name/$bkp_db.sql
+                sleep 0.8
+                echo "data base"
+        }
+    fi
+    showMenu
+   # m=$?
+done
+
+exit 0;
+
