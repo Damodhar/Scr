@@ -1,0 +1,41 @@
+#!/bin/bash
+
+
+PS3="Please Select and Option :"
+LIST="Grant_sudo_rights Revoke_sudo_rights clear_cache Quit"
+
+select i in $LIST
+
+do
+
+        if [[ $i = "Grant_sudo_rights" ]]
+                then
+                        echo -e "Please enter the Username to grant sudo rights :\c"
+                        read username
+                        usermod -a -G wheel $username
+                        sleep 0.5
+                        echo "Sudo rights have been granted to $username"
+                        exit
+        elif [[ $i = "Revoke_sudo_rights" ]]
+                then
+                        echo -e "Please enter the Username to Revoke sudo rights :\c"
+                        read username
+                        usermod -G users $username
+                        echo "Sudo Access has been revoked"
+                        exit
+        elif [[ $i = "clear_cache" ]]
+                then
+                        echo "Clearing the Cache on `hostname`"
+                        sleep 0.8
+                        sync; echo 3 > /proc/sys/vm/drop_caches 
+                        phing -l
+        elif [[ $i = "Quit" ]]
+                  then
+                        echo "Quiting the infrastructure script"
+                        sleep 0.8
+                        exit
+
+
+fi
+done
+
