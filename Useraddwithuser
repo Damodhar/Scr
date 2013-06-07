@@ -1,0 +1,6 @@
+
+for i in `cat users` ;do
+useradd $i;
+echo $i"@123" | passwd --stdin $i;
+#echo $i"wet"
+done
