@@ -1,0 +1,11 @@
+#!/bin/bash
+top -b -n 1 > /home/damodhar/top.txt
+cpuvalue=`cat /home/damodhar/top.txt | grep  Cpu | awk -F, '{print $1}' | awk -F : '{print $2}' | cut -f1 -d%`
+
+if [[ $cpuvalue >  '80' ]]
+
+then
+        echo  "Current CPU utilisation is very high $cpuvalue"
+else
+        echo "CPU utilisation is normal $cpuvalue"
+fi
