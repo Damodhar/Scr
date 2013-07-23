@@ -1,0 +1,159 @@
+LogFormat "%h %l %t %D \"%r\" %>s %b" examplelog
+
+<VirtualHost *>
+        ServerName www.example.com
+        ServerAlias example.dev.example.com example.qa.example.com local.example.com example.com
+        DocumentRoot /var/www/example/
+        CustomLog /var/log/httpd/example-access.log examplelog
+        ErrorLog /var/log/httpd/example-error.log
+        Alias /media/ /var/www/picture/
+
+        # tell magento this is secure example
+        SetEnv HTTPS on
+
+        # tell apache to use HTTP/1.0
+        SetEnv force-no-vary
+        SetEnv downgrade-1.0
+
+        Header set X-Served-By "%{X_SERVED_BY}e" ENV=X_SERVED_BY
+
+        # Search proxy
+        <Proxy balancer://example-search-proxy>
+                BalancerMember http://127.0.0.1:port
+                BalancerMember http://127.0.0.1:port
+                BalancerMember http://127.0.0.1:port
+                BalancerMember http://127.0.0.1:port
+        </Proxy>
+        ProxyPass /search-proxy/ balancer://example-search-proxy/2011-02-01/
+
+        RewriteEngine on
+        
+        # system monitoring
+        RewriteRule ^/sysmonitoring/ /sysmonitoring/index.php [L,PT]
+
+        # IOS app
+        RewriteRule ^/(ar/)?xmlconnect /index.php [L,PT]
+
+        # Legacy URL rewriting
+        RewriteRule ^/index.htm https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/DailyPromotion/index.html https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/Contact.htm https://www.example.com/contacts/ [L,NS,R=301]
+        RewriteRule ^/Wansacatalogue/index.html https://www.example.com/catalogsearch/result/?q=wansa [L,NS,R=301]
+        RewriteRule ^/promotions/July.Aug2011/index.html https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/aboutus/index.htm https://www.example.com/about/ [L,NS,R=301]
+        RewriteRule ^/menu/mobilemenu.htm https://www.example.com/mobile-phones.html [L,NS,R=301]
+        RewriteRule ^/promotions/May2011/index.html https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/Mobiles/ https://www.example.com/mobile-phones.html?cat=3030 [L,NS,R=301]
+        RewriteRule ^/menu/wansamenu.htm https://www.example.com/catalogsearch/result/?q=wansa [L,NS,R=301]
+        RewriteRule ^/Support/index.htm https://www.example.com/help-and-services/ [L,NS,R=301]
+        RewriteRule ^/promotions/June2011/index.html https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/EasyCredit/index.htm https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/April2011/ https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/promotions/SHW.WG.Ramadan2011/index.html https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/Showrooms/index.htm https://www.example.com/showrooms/ [L,NS,R=301]
+        RewriteRule ^/promotions/SHW.Eid.2011/index.html https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/promotions/B2S.Sep.2011/index.html https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/Delivery/index.htm https://www.example.com/delivery-and-installation/ [L,NS,R=301]
+        RewriteRule ^/promotions/Travel2011/index.html https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/Television.htm https://www.example.com/tv-video/televisions.html [L,NS,R=301]
+        RewriteRule ^/support/index.htm https://www.example.com/help-and-services/ [L,NS,R=301]
+        RewriteRule ^/support/Showrooms.htm https://www.example.com/showrooms/ [L,NS,R=301]
+        RewriteRule ^/Promotions/AvenuesTVPromotion/index.html https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/menu/TVmenu.htm https://www.example.com/tv-video/televisions.html [L,NS,R=301]
+        RewriteRule ^/promotions/Oct2011Catalogue/index.html https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/Support/vendorsupport/index.htm https://www.example.com/help-and-services/ [L,NS,R=301]
+        RewriteRule ^/ContactConfirm.htm https://www.example.com/contacts [L,NS,R=301]
+        RewriteRule ^/FarwaniyaCelebration/index.html https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/mobile/mobile.htm https://www.example.com/mobile-phones.html?cat=3030 [L,NS,R=301]
+        RewriteRule ^/television.htm https://www.example.com/tv-video.html?cat=99 [L,NS,R=301]
+        RewriteRule ^/brands/Wansa/wansa.htm https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/Mobiles/001425.html https://www.example.com/mobile-phones.html [L,NS,R=301]
+        RewriteRule ^/menu/philipsmenu.htm https://www.example.com/catalogsearch/result/?q=philips [L,NS,R=301]
+        RewriteRule ^/Home-Appliances.htm https://www.example.com/major-appliances.html [L,NS,R=301]
+        RewriteRule ^/Mobiles/001424.html https://www.example.com/mobile-phones.html [L,NS,R=301]
+        RewriteRule ^/Mobile/Mobile.htm https://www.example.com/mobile-phones.html [L,NS,R=301]
+        RewriteRule ^/Mobile/Nokia-5800.htm https://www.example.com/mobile-phones.html [L,NS,R=301]
+        RewriteRule ^/menu/cameramenu.htm https://www.example.com/photography.html?cat=221&dir=asc&order=position [L,NS,R=301]
+        RewriteRule ^/TechForce/index.htm https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/Mobile/Blackberry-8900-Javelin.htm https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/Kitchen-Appliances.htm https://www.example.com/small-appliances/kitchen-appliances.html [L,NS,R=301]
+        RewriteRule ^/category/computers.htm https://www.example.com/computers-tablets/computers.html [L,NS,R=301]
+        RewriteRule ^/menu/computermenu.htm https://www.example.com/computers-tablets/computers.html [L,NS,R=301]
+        RewriteRule ^/brands/Philips/Philips-Food-Processor-HR762570.htm https://www.example.com/catalogsearch/result/index/?cat=2863&dir=asc&order=relevance&q=food+processor [L,NS,R=301]
+        RewriteRule ^/aboutus/about.htm https://www.example.com/about/ [L,NS,R=301]
+        RewriteRule ^/Mobile/Samsung-F-480.htm https://www.example.com/catalogsearch/result/?q=samsung [L,NS,R=301]
+        RewriteRule ^/Cameras/Cameras.htm https://www.example.com/photography/cameras.html [L,NS,R=301]
+        RewriteRule ^/CamerasCamcorders/index.htm https://www.example.com/photography/camcorders.html [L,NS,R=301]
+        RewriteRule ^/menu/personalmenu.htm https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/Mobile/Nokia-5800.htm https://www.example.com/catalogsearch/result/?q=nokia [L,NS,R=301]
+        RewriteRule ^/GiftVouchers/index.htm https://www.example.com/ [L,NS,R=301]
+        RewriteRule ^/brands/Wansa/Wansa-Microwave.htm https://www.example.com/catalogsearch/result/index/?cat=10&q=wansa [L,NS,R=301]
+        RewriteRule ^/brands/Philips/Philips-Blender.htm https://www.example.com/catalogsearch/result/index/?cat=39&q=philips [L,NS,R=301]
+        RewriteRule ^/business/WansaDistributor.htm https://www.example.com/catalogsearch/advanced/result/?brand=409 [L,NS,QSA,R=301]
+        RewriteCond %{QUERY_STRING} iphone
+        RewriteRule ^/searchpro/index.asp https://www.example.com/ [L,NS,R=301]
+        RewriteCond %{QUERY_STRING} wansa\+home\+appliances
+        RewriteRule ^/searchpro/index.asp https://www.example.com/catalogsearch/result/index/?cat=256&q=wansa [L,NS,R=301]
+        RewriteCond %{QUERY_STRING} wansa\+lcd
+        RewriteRule ^/searchpro/index.asp https://www.example.com/catalogsearch/result/index/?cat=77&q=wansa [L,NS,R=301]
+        RewriteRule ^/searchpro/index.asp https://www.example.com/catalogsearch/result/index/ [L,NS,QSA,R=301]
+        
+        RewriteCond %{REQUEST_URI} !^/(media|skin|js|search-proxy)/
+        RewriteCond %{DOCUMENT_ROOT}%{REQUEST_FILENAME} !-f
+        RewriteCond %{DOCUMENT_ROOT}%{REQUEST_FILENAME} !-d
+        RewriteCond %{DOCUMENT_ROOT}%{REQUEST_FILENAME} !-l
+        RewriteRule .* /index.php [L,PT]
+
+        # Fix IE POST body cutting bug
+        <Limit POST>
+                SetEnv nokeepalive
+        </Limit>
+</VirtualHost>
+
+<Directory /var/www/example/>
+        DirectoryIndex index.php api.php
+        AllowOverride none
+
+        php_value memory_limit 512M
+        php_value max_execution_time 18000
+        php_value auto_prepend_file /var/www/example/prepend.php
+        php_flag magic_quotes_gpc off
+        php_flag session.auto_start off
+        php_flag suhosin.session.cryptua off
+        Options -Indexes +FollowSymLinks
+        ErrorDocument 503 /holding/be_back_soon.html
+
+        AddDefaultCharset Off
+</Directory>
+
+<Directory /var/www/example/app>
+        deny from all
+</Directory>
+
+<Directory /var/www/example/downloader>
+        <Files ~ "\.(cfg|ini|xml)$">
+                deny from all
+        </Files>
+</Directory>
+
+<Directory /var/www/example/errors>
+        <FilesMatch "\.(xml|phtml)$">
+                deny from all
+        </FilesMatch>
+</Directory>
+
+<Directory /var/www/example/includes>
+        deny from all
+</Directory>
+
+<Directory /var/www/example/lib>
+        deny from all
+</Directory>
+
+<Directory /var/www/example/shell>
+        deny from all
+</Directory>
+
+<Directory /var/www/example/var>
+        deny from all
+</Directory>
