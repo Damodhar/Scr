@@ -1,0 +1,217 @@
+log_format example-example '$remote_addr - $remote_user [$time_local] '
+                      '"$request" $status $body_bytes_sent '
+                      '"$http_referer" "$http_user_agent" '
+                      '$gzip_ratio $upstream_response_time';
+
+# ip list for use in maintenance mode
+geo $example_trusted {
+    include conf.d/example-geoip.include;
+}
+
+# Default config for nginx
+# Nginx own default config MUST be REMOVED
+server {
+    listen 80 default;
+    listen 81 default;
+
+    charset utf-8;
+
+    # accept any name
+    server_name _;
+
+    # set default redirect host name
+    set $redirect "www.example.com";
+
+    # RS monitoring
+    location /stock_monitoring_check.html {
+        root /var/www/html;
+    }
+    location ~ /[^/]+-status.html {
+        root /var/www/html;
+    }
+
+    # nginx status checker
+    location /nginx-status {
+        stub_status on;
+        access_log off;
+        allow 192.168.0.0/24;
+        deny all;
+    }
+
+    # modify redirect host name according to a list of main example aliases
+    if ($host ~ "^(example\.(dev|qa)|admin|m|local)\.example\.com$") {
+        set $redirect $host;
+    }
+
+    # redirect all requests to redirect host
+    location / {
+        rewrite (.*) http://$redirect$1 permanent;
+    }
+}
+
+# include upstreams config
+include conf.d/example-upstream.include;
+
+# example.com server config
+server {
+    # listen only for https requests as far as we use only it atm
+    listen 81;
+    listen 80;
+
+    charset utf-8;
+
+    # gzip everything except for ie6 (legacy)
+    gzip             on;
+    gzip_static      on;
+    gzip_min_length  1000;
+    gzip_proxied     any;
+    gzip_types       text/plain text/css text/javascript application/x-javascript;
+    gzip_disable     "msie6";
+    gzip_vary        on;
+
+    # main server aliases
+    server_name www.example.com admin.example.com m.example.com
+        example.dev.example.com example.qa.example.com local.example.com;
+
+    # set proxy host to the same as got
+    # can be overriden later with admin include
+    set $proxy_hostname $host;
+
+    # server root
+    root /var/www/example/;
+
+    # logs
+    access_log /var/log/nginx/example-access.log example-example;
+    error_log /var/log/nginx/example-error.log error;
+
+    set $referer $http_referer;
+
+    # include admin settings
+    include conf.d/example-admin.include;
+
+    # media flag, used for maintenance mode
+    set $media "";
+    if ($request_uri ~ '^/(media|skin|favicon\.ico)/') {
+        set $media "D";
+    }
+
+
+    # media location
+    location ^~ /picture/ {
+        alias /var/www/picture/;
+        expires 1M;
+    }
+
+    # fonts for IE9/Chrome using CDN
+    set $font "";
+    if ($request_filename ~ "\.(ttf|eot|woff)$") {
+        set $font "F";
+    }
+
+    # skin location
+    location ^~ /skin/ {
+        expires 1w;
+        if ($font) {
+            add_header Access-Control-Allow-Origin *;
+        }
+    }
+
+    # rewrite browser requests to proper location of favicon
+    location /favicon.ico {
+        root /var/www/example/skin/frontend/picture/default;
+        expires 1w;
+    }
+
+    # deny any .ht-like files
+    location ~ /\.ht {
+        deny all;
+    }
+
+    # maintenance file suffix
+    set $maintenance_suffix "";
+    if ($request_uri ~ "^/ar/") {
+        set $maintenance_suffix "_ar";
+    }
+
+    # maintenance location
+    location @maintenance {
+        rewrite .* /holding/be_back_soon$maintenance_suffix.html break;
+    }
+
+    # maintenance page shown when "maintenance" file is present
+    # in config folder
+
+    # we don't want to prevent serving media in maintenace mode
+    # so prepend it with media flag
+    set $maintenance "$media$example_trusted";
+    if (-f /etc/picture/maintenance) {
+        set $maintenance "M$maintenance";
+    }
+
+    # force to maintenance page in case of 50X errors
+    error_page 500 502 503 504 @maintenance;
+
+    # show maintenance page in maintenance mode only to non-trusted IP adresses
+    if ($maintenance = "MN") {
+        return 503;
+    }
+
+    # redirect incomplete arabic example url
+    if ($request_uri = "/ar") {
+        rewrite .* http://$host/ar/ permanent;
+    }
+
+    # admin section, deny admin url if no "admin" file in picture config
+    # directory
+    set $admin "";
+    if ($request_uri ~ "^(/ar)?(/index.php)?/admin") {
+        set $admin "A";
+    }
+
+    if (!-e /etc/picture/admin) {
+        set $admin "D$admin";
+    }
+
+    if ($admin = "DA") {
+        # 404 will be thrown by magento
+        rewrite ^(/ar)?.* $1/not-allowed-admin break;
+    }
+
+    # anti-clickjacking
+    set $frames "";
+    if ($example_trusted != "Y") {
+        set $frames "sameorigin";
+    }
+
+    # proxy rest to backend
+    location / {
+        # anti-clickjacking
+        add_header "X-Frame-Options" $frames;
+
+        # unset this values, magento look into them instead of HTTP_HOST
+        proxy_set_header X-Forwarded-Host "";
+        proxy_set_header X-Forwarded-Server "";
+
+        # disable gzip/deflate in response
+        proxy_set_header Accept-Encoding "";
+
+        # show store errors with nginx
+        proxy_intercept_errors on;
+
+        # HTTP/1.0
+        proxy_set_header Connection Close;
+
+        # Pass real IP/host to backend
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $proxy_hostname;
+        proxy_set_header Referer $referer;
+
+        # maintenance mode header
+        proxy_set_header X-Maintenance-Mode $maintenance;
+
+        proxy_pass http://example_backend;
+    }
+}
+
+# line for bumping file version (for dependent files included in nginx package)
+# ..
