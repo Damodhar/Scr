@@ -1,0 +1,1 @@
+//servername/sharename$    /mnt/mountname cifs ro,credentials=/root/.password,iocharset=utf8,sec=ntlmssp,file_mode=0555,dir_mode=0555
