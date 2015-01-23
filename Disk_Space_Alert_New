@@ -1,0 +1,14 @@
+#!/bin/bash
+ADMIN="dtakalkar@mcftech.com,hhersch@mcftech.com"
+# set alert level  is test default
+ALERT=75
+df -H | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{ print $5 " " $1 }' | while read output;
+do
+#echo $output
+usep=$(echo $output | awk '{ print $1}' | cut -d'%' -f1 )
+partition=$(echo $output | awk '{ print $2 }' )
+if [ $usep -ge $ALERT ]; then
+echo "Running out of space \"$partition ($usep%)\" on $(hostname) as on $(date)" |
+mail -s "MCFSANDBOX Alert: Almost out of disk space $usep (Test Purpose)" $ADMIN
+fi
+done
