@@ -1,0 +1,19 @@
+cd \
+
+md adobe-flash-update
+
+cd adobe-flash-update
+
+bitsadmin.exe /transfer "Adobe-Flash-Player-Update-IE_ActiveX" https://fpdownload.macromedia.com/get/flashplayer/current/licensing/win/install_flash_player_21_active_x.msi C:\adobe-flash-update\install_flash_player_21_active_x.msi
+
+msiexec /i install_flash_player_21_active_x.msi /passive
+
+bitsadmin.exe /transfer "Adobe-Flash-Player-Update-Firefox" https://fpdownload.macromedia.com/get/flashplayer/current/licensing/win/install_flash_player_21_plugin.msi C:\adobe-flash-update\install_flash_player_21_plugin.msi
+
+msiexec /i install_flash_player_21_plugin.msi /passive
+
+bitsadmin.exe /transfer "Adobe-Flash-Player-Update-Chrome-Opera" https://fpdownload.macromedia.com/get/flashplayer/current/licensing/win/install_flash_player_21_ppapi.msi C:\adobe-flash-update\install_flash_player_21_ppapi.msi
+
+msiexec /i install_flash_player_21_ppapi.msi /passive
+
+exit
