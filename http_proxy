@@ -1,0 +1,53 @@
+<VirtualHost *:80>
+        ServerName www.example.com
+        Redirect permanent / https://www.example.com/
+#        LoadModule proxy_module modules/mod_proxy.so
+#        LoadModule proxy_http_module modules/mod_proxy_http.so
+        #LoadModule proxy_html_module modules/mod_proxy_html.so
+        #LoadModule "../modules/mod_proxy.so"
+        #AddModule  mod_proxy.c
+#        <Proxy *>
+#                Order deny,allow
+#                Allow from all
+#        </Proxy>
+#
+#        ProxyRequests Off
+#        ProxyPreserveHost on
+#        ProxyPass /  http://www.example.com:8080/
+#        ProxyPassReverse /  http://www.example.com:8080/
+#        <Location />
+#                Order allow,deny
+#                Allow from all
+#        </Location>
+
+</VirtualHost>
+#NameVirtualHost *:443
+
+<VirtualHost *:443>
+        ServerName www.example.com
+        LoadModule proxy_module modules/mod_proxy.so
+        LoadModule proxy_http_module modules/mod_proxy_http.so
+        LoadModule ssl_module modules/mod_ssl.so
+
+        <Proxy *>
+                Order deny,allow
+                Allow from all
+        </Proxy>
+
+        SSLProxyEngine On
+        ProxyRequests Off
+        ProxyPreserveHost on
+        ProxyPass /  http://www.example.com:8080/
+        ProxyPassReverse /  http://www.example.com:8080/
+
+        <Location />
+        Order allow,deny
+                Allow from all
+        </Location>
+
+        SSLEngine on
+        SSLCertificateFile /etc/pki/tls/certs/*.com.crt
+        SSLCertificateKeyFile /etc/pki/tls/certs/*.key
+        SSLCertificateChainFile /etc/pki/tls/certs/sf_bundle-g2-g1.crt
+</VirtualHost>
+
