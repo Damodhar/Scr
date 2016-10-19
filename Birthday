@@ -1,0 +1,17 @@
+#!/bin/bash
+DATE=$(date '+%m-%d')
+bdays=$(cat /birthday/birthdate)
+for i in $bdays
+do
+bday=$(echo $i | awk -F= '{print $1}')
+name=$(echo $i | awk -F= '{print $2}')
+email=$(echo $i | awk -F= '{print $3}')
+[[ $DATE = $bday ]]&& {
+/usr/sbin/sendmail -v -i -t -f zenoss@monitoring.upeadev.com <<END
+subject: Today is $name's Birthday
+to: $email
+to: UnileverPEA.DBATeam@saama.com
+Happy Birthday $name.!!!
+END
+}
+done
