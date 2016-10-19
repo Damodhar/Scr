@@ -1,0 +1,94 @@
+:MENU
+
+
+@echo off
+cd c:\
+
+ECHO =====================================================
+ECHO Press 1, 2, 3 or 4 to select your task, or Q to EXIT
+ECHO =====================================================
+
+ECHO 1 - Add User
+ECHO 2 - Disable User
+ECHO 3 - Change user password
+ECHO 4 - Unlock User Account
+ECHO Q - exit
+
+
+
+SET /P INPUT=Please select a number:
+
+IF /I '%INPUT%'=='1' GOTO 1
+IF /I '%INPUT%'=='2' GOTO 2
+IF /I '%INPUT%'=='3' GOTO 3
+IF /I '%INPUT%'=='4' GOTO 4
+IF /I '%INPUT%'=='Q' GOTO Quit
+
+ECHO ============INVALID INPUT============
+
+ECHO Please select a number from the Main 
+echo Menu [1-4] or select 'Q' to quit.
+ECHO =====================================
+ECHO ======PRESS ANY KEY TO CONTINUE======
+
+PAUSE > NUL
+GOTO MENU
+
+:1
+set /p user1=Type the Username and press Enter:
+set /p password1=Type the password:
+net user %user2% /DOMAIN | FIND /I "user name"
+If %ErrorLevel%==0 goto 1A
+
+:1A
+net user %user1% %password1% /add /active:yes /domain
+
+:1B @Username already exist or Check the password.
+
+goto MENU
+==========================================================
+:2
+set /p user2=Type the Username and press Enter:
+net user %user2% /DOMAIN | FIND /I "user name"
+If %ErrorLevel%==0 goto 2A
+goto 2B
+
+:2A
+net user %user2% /active:no
+
+:2B @echo Enter valid username.
+goto MENU
+==========================================================
+:3
+set /p user3=Type the Username and press Enter:
+net user %user3% /DOMAIN | FIND /I "user name" 
+
+If %ErrorLevel%==0 goto 3A
+goto 3B
+
+:3A
+set /p password=Type New Password:
+@echo your password is %password%
+net user %user3% %password%  /domain  
+
+:3B @echo Enter Valid username
+goto MENU
+
+==========================================================
+:4
+set /p user4=Type the Username and press Enter:
+net user %user4% /DOMAIN | FIND /I "user name"
+If %ErrorLevel%==0 goto 4A
+goto 4B
+
+:4A
+Net user %user4% /domain /active:YES
+@echo Account is acitve.
+
+:4B @echo Enter Valid username
+goto Menu
+==========================================================
+pause
+
+
+
