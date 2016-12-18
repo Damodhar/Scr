@@ -1,18 +1,18 @@
 Create VPN Certificate 
 ======================================================
-Root - makecert -sky exchange -r -n "CN=MCFAZSPONSORSHIP" -pe -a sha256 -len 2048 -ss My "MCFAZSPONSORSHIP.cer"
-Client - makecert.exe -n "CN=akiro@mcfazsponsorship.com" -pe -sky exchange -m 96 -ss My -in "MCFAZSPONSORSHIP" -is my -a sha256
+Root - makecert -sky exchange -r -n "CN=AZSPONSORSHIP" -pe -a sha256 -len 2048 -ss My "AZSPONSORSHIP.cer"
+Client - makecert.exe -n "CN=ak@mazsponsorship.com" -pe -sky exchange -m 96 -ss My -in "AZSPONSORSHIP" -is my -a sha256
 ======================================================
-CrateVM  - MCFAZDEVSRV01
-Set-AzureSubscription -SubscriptionName 'MCF Sandbox' -CurrentStorageAccountName 'mcfsandbox01'
+CrateVM  - AZDEVSRV01
+Set-AzureSubscription -SubscriptionName 'Sandbox' -CurrentStorageAccountName 'msandbox01'
 $image = Get-AzureVMImage -ImageName "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201502.01-en.us-127GB.vhd"
-$ReservedIP = New-AzureReservedIP -ReservedIPName "MCFAZDEVSRV01" -Label "MCFAZDEVSRV01" -Location "East US"
-$vm = New-AzureVMConfig -Name "MCFAZDEVSRV01" -InstanceSize "Medium" -Image $image.ImageName –AvailabilitySetName “MCFAZDEVSRV01” 
-Add-AzureProvisioningConfig –VM $vm -Windows -AdminUserName “mcfdev01” -Password “M9fC@D3v20!%”
+$ReservedIP = New-AzureReservedIP -ReservedIPName "AZDEVSRV01" -Label "AZDEVSRV01" -Location "East US"
+$vm = New-AzureVMConfig -Name "AZDEVSRV01" -InstanceSize "Medium" -Image $image.ImageName –AvailabilitySetName “AZDEVSRV01” 
+Add-AzureProvisioningConfig –VM $vm -Windows -AdminUserName “dev01” -Password “M9fC@D3v20!%”
 Set-AzureSubnet -SubnetNames "mcfsandboxsub1" -VM $vm 
 Set-AzureStaticVNetIP -IPAddress "10.0.4.9" -VM $vm
-New-AzureVM -ServiceName "MCFAZDEVSRV01" –VNetName “MCFSANDBOX”  –VM $vm  -ReservedIPName "MCFAZDEVSRV01"  -Location "East US"
-$vm | New-AzureVM -ServiceName "MCFAZDEVSRV01"
+New-AzureVM -ServiceName "AZDEVSRV01" –VNetName “SANDBOX”  –VM $vm  -ReservedIPName "AZDEVSRV01"  -Location "East US"
+$vm | New-AzureVM -ServiceName "AZDEVSRV01"
 ======================================================
 Azure Image -
 
