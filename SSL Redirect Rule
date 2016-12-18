@@ -1,0 +1,13 @@
+<VirtualHost *:80> ServerName cdn.mcfcloud.com
+Redirect / https://cdn.mcfcloud.com/
+</VirtualHost>
+
+
+
+HSTS Setting
+# Optionally load the headers module:
+LoadModule headers_module modules/mod_headers.so
+
+<VirtualHost 67.89.123.45:443>
+    Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains; preload"
+</VirtualHost>
