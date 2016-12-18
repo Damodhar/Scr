@@ -1,0 +1,57 @@
+Create VPN Certificate 
+======================================================
+Root - makecert -sky exchange -r -n "CN=MCFAZSPONSORSHIP" -pe -a sha256 -len 2048 -ss My "MCFAZSPONSORSHIP.cer"
+Client - makecert.exe -n "CN=akiro@mcfazsponsorship.com" -pe -sky exchange -m 96 -ss My -in "MCFAZSPONSORSHIP" -is my -a sha256
+======================================================
+CrateVM  - MCFAZDEVSRV01
+Set-AzureSubscription -SubscriptionName 'MCF Sandbox' -CurrentStorageAccountName 'mcfsandbox01'
+$image = Get-AzureVMImage -ImageName "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201502.01-en.us-127GB.vhd"
+$ReservedIP = New-AzureReservedIP -ReservedIPName "MCFAZDEVSRV01" -Label "MCFAZDEVSRV01" -Location "East US"
+$vm = New-AzureVMConfig -Name "MCFAZDEVSRV01" -InstanceSize "Medium" -Image $image.ImageName –AvailabilitySetName “MCFAZDEVSRV01” 
+Add-AzureProvisioningConfig –VM $vm -Windows -AdminUserName “mcfdev01” -Password “M9fC@D3v20!%”
+Set-AzureSubnet -SubnetNames "mcfsandboxsub1" -VM $vm 
+Set-AzureStaticVNetIP -IPAddress "10.0.4.9" -VM $vm
+New-AzureVM -ServiceName "MCFAZDEVSRV01" –VNetName “MCFSANDBOX”  –VM $vm  -ReservedIPName "MCFAZDEVSRV01"  -Location "East US"
+$vm | New-AzureVM -ServiceName "MCFAZDEVSRV01"
+======================================================
+Azure Image -
+
+Get-AzureVMImage | ft Label,ImageName,LogicalSizeInGB
+
+Get-AzureVMImage | where-object { $_.Label -like "Windows Server 2012 R2 SP1*" }
+
+ Get-AzureVMImage | where-object { $_.Label -like "SQL Server 2012 SP2*" }
+
+Get-AzureVMImage | where-object { $_.Label -like "Ubuntu *" }
+b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-12_04_3-LTS-amd64-server-20131114-en-us-30GB
+b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-15_04-amd64-server-20150929-en-us-30GB
+
+Get-AzureVMImage | where-object { $_.Label -like "Ubuntu Server 14.04 *" }
+b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04-LTS-amd64-server-20140724-en-us-30GB
+
+Ubuntu Server 14.04 LTS
+
+ Get-AzureVMImage | where-object { $_.Label -like "OpenLogic 7*" }
+ 5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-70-20150325
+
+fb83b3509582419d99629ce476bcb5c8__SQL-Server-2012-SP2-11.0.5569.0-DW-ENU-Win2012-cy15su02 - Enterprise Edition
+ fb83b3509582419d99629ce476bcb5c8__SQL-Server-2012-SP2-11.0.5569.0-Std-ENU-Win2012-cy15su02 - Standard Edition
+
+New-AzureVM : BadRequest: Value 'medium' specified for parameter 'RoleSize' is invalid. Allowed values are 'ExtraSmall,
+Small,Medium,Large,ExtraLarge,A5,A6,A7,A8,A9,Basic_A0,Basic_A1,Basic_A2,Basic_A3,Basic_A4,Standard_D1,Standard_D2,Stand
+ard_D3,Standard_D4,Standard_D11,Standard_D12,Standard_D13,Standard_D14,Standard_G1,Standard_G2,Standard_G3,Standard_G4,
+Standard_G5'.
+================================================================
+VNET-to-VNET Connectivity
+Set-AzureVNetGatewayKey -VNetName MCFPRDVNet -LocalNetworkSiteName Local_for_MCFSandbox -SharedKey Xl6NsMjlfuPnPlnDZJv4
+Set-AzureVNetGatewayKey -VNetName MCFSANDBOX -LocalNetworkSiteName Local_for_MCFPRDVNet -SharedKey Xl6NsMjlfuPnPlnDZJv4
+================================================================
+Server Move 
+
+MCFAZSPDEV01
+https://portalvhdsqf254w4tpbz0g.blob.core.windows.net/vhds/MCFAZSPDEV-MCFAZSPDEV-2015-04-21.vhd
+Access key ==>      x/WwWqttg5yjJFoWcE66fCKVJZ4sCDsDzD9yd5O7q20ISHGjX19FjwL45s+1U8XeICrlbKDVRnXVj0SaKpl5VA==
+http://disneyaz-erform.mcfcloud.com/
+
+AzCopy /Source:https://portalvhdsqf254w4tpbz0g.blob.core.windows.net/vhds/  /Dest:https://mcfazsponsorship.blob.core.windows.net/vhds/  /SourceKey:x/WwWqttg5yjJFoWcE66fCKVJZ4sCDsDzD9yd5O7q20ISHGjX19FjwL45s+1U8XeICrlbKDVRnXVj0SaKpl5VA==  /DestKey:wI2sDAjcZiJO1dEskXXzazlO6NczyskaS26ddlNqpVPixc4ZHQyjhQ7igfl9FGWlGUonstHhUMRsvuYoAe0/eQ==  /Pattern:MCFAZSPDEV-MCFAZSPDEV-2015-04-21.vhd
+================================================================
