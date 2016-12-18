@@ -1,0 +1,12 @@
+Access via SSH to the instance and run fdisk /dev/xvde
+Hit p to show current partitions
+Hit d to delete current partitions (if there are more than one, you have to delete one at a time) NOTE: Don't worry data is not lost
+Hit n to create a new partition
+Hit p to set it as primary
+Hit 1 to set the first cylinder
+Set the desired new space (if empty the whole space is reserved)
+Hit a to make it bootable
+Hit 1 and w to write changes
+Reboot instance
+Log via SSH and run resize2fs /dev/xvde1
+Finally check the new space running df -h
