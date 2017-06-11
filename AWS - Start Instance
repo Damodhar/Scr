@@ -7,7 +7,7 @@ truncate -s 0 /insstart/start.txt
 for instances in $(cat /insstop/instances.txt);do
 echo "Starting the instance"
 /usr/local/ec2/ec2-api-tools-1.7.5.0/bin/ec2-start-instances $instances -O Key_key -W Key_Key --region us-east-1
-servername=$(/usr/local/ec2/ec2-api-tools-1.7.5.0/bin/ec2-describe-instances $instances -O AKIAJDPOAADQAYRTG3SA -W wTAE2wpChElyBq2zHxe5VhbzmXMGv5aPS5OppL65 --region us-east-1 |grep Name | awk '{print $5;}')
+servername=$(/usr/local/ec2/ec2-api-tools-1.7.5.0/bin/ec2-describe-instances $instances -O secret_key -W acess_key --region us-east-1 |grep Name | awk '{print $5;}')
 echo "Server "\"$servername\"" started successfully, Instance Id: $instances" >>/insstart/start.txt
 done
 
