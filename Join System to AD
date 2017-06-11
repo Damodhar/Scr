@@ -1,0 +1,49 @@
+@echo off
+
+:Input
+set MACHINENAME=
+set /P MACHINENAME=Enter the name of the server (ex. servervename): %=%
+if "%MACHINENAME%"=="" GOTO Input
+
+ECHO **********************************************
+ECHO Turning off Windows Firewall...
+ECHO **********************************************
+netsh firewall set opmode disable 
+
+ECHO **********************************************
+ECHO Adding the DNS entries for the PROD domain...
+ECHO **********************************************
+NetSH Interface ipv4 Set DNSServer "Local Area Connection 2" Static DNS_IP
+NetSH Interface ipv4 add DNSServer "Local Area Connection 2" DNS_IP
+NetSH Interface ipv4 add DNSServer "Local Area Connection 2" DNS_IP
+NetSH Interface ipv4 Set DNSServer "Local Area Connection" Static DNS_IP
+NetSH Interface ipv4 add DNSServer "Local Area Connection" DNS_IP
+NetSH Interface ipv4 add DNSServer "Local Area Connection" DNS_IP
+reg add HKLM\System\currentcontrolset\services\tcpip\parameters /v "NV Domain" /d "www.example.com" /f 
+
+ECHO **********************************************
+ECHO Changing the computer name...
+ECHO **********************************************
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName" /v "ComputerName" /t REG_SZ /d %MACHINENAME% /f 
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\ComputerName\ActiveComputerName" /v "ComputerName" /t REG_SZ /d %MACHINENAME% /f 
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Hostname" /t REG_SZ /d %MACHINENAME% /f 
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "NV Hostname" /t REG_SZ /d %MACHINENAME% /f 
+
+ECHO **********************************************
+ECHO Joining the PROD domain...
+ECHO **********************************************
+netdom join %MACHINENAME% /d:www.example.com /ud:www\username /pd:* /SecurePasswordPrompt /reboot:30 
+
+REM Add the DevAdmins group to the local Administrators group
+REM Add the DevUsers group to the Remote Dekstop Users group
+ECHO **********************************************
+ECHO Adding domain groups to local groups...
+ECHO **********************************************
+net localgroup administrators www\usergroup /add 
+net localgroup "Remote Desktop Users" www\usersgroup /add
+
+ECHO **********************************************
+ECHO Complete!
+ECHO **********************************************
+
+PAUSE
