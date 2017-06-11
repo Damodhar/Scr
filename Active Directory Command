@@ -1,0 +1,20 @@
+dsget user "<DN of the user>" -memberof -expand 
+
+
+dsquery user -samid "mandar.garge" | dsget user -memberof | export-csv d:\damodhar\pro.csv
+
+
+get-aduser -filter * -Properties cn, mail | Select cn, mail | Export-csv d:\damodhar\domianusers.csv 
+
+get-aduser -filter * -properties cn, mail, memberOf | select cn, mail, memberOf | export-csv d:\damodhar\pro.csv
+
+Get-ADUser -Filter * -SearchBase "DC=cloud,DC=vivaki,DC=com" -Properties cn, samaccountname, mail,memberof | export-csv d:\damodhar\pro.csv -NoTypeInformation
+
+get-aduser -filter * -searchbase "OU=AOD,DC=cloud,DC=vivaki,DC=com" -properties memberof | select samaccountname, @{name="MemberOf";expression={$_.memberof -join "`n"}} | export-csv d:\damodhar\pro.csv
+
+
+
+
+
+
+dsquery user -samid "tory.grossman" | dsget user -memberof | export-csv d:\damodhar\pro.csv
