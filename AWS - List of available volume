@@ -1,0 +1,15 @@
+#!/bin/sh
+#EC2_HOME=/usr/local/ec2/ec2-api-tools-1.7.5.0
+export EC2_HOME=/usr/local/ec2/ec2-api-tools-1.7.5.0
+export JAVA_HOME=/opt/jdk1.7.0_79
+truncate -s 0 /ProdAMI/Prodavailable.txt
+/usr/local/ec2/ec2-api-tools-1.7.5.0/bin/ec2-describe-volumes -O access_key -W secret_key --region us-west-1 | grep available | awk {'print $2'} > /ProdAMI/Prodavailable.txt
+
+#mail -s "Weekly List of Available Volumes for Unilever PROD" mail_from </ProdAMI/Prodavailable.txt
+/usr/sbin/sendmail -v -i -t -f zenoss@monitoring.upeadev.com <<END
+subject: Weekly List of Available Volumes for  `date`
+to: mail_id
+`cat /ProdAMI/Prodavailable.txt`
+END
+
+exit
