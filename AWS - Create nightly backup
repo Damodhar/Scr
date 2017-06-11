@@ -1,0 +1,39 @@
+#!/bin/sh
+export EC2_HOME=/usr/local/ec2/ec2-api-tools-1.7.5.0
+export JAVA_HOME=/opt/jdk1.7.0_79
+truncate -s 0 /ProdAMI/Prodpurge.txt
+truncate -s 0 /ProdAMI/Prodsnap.txt
+truncate -s 0 /ProdAMI/AMIProd.txt
+#ami=$(cat ami.txt)
+echo "starting with retreiving"
+/usr/local/ec2/ec2-api-tools-1.7.5.0/bin/ec2-describe-instances -O Access_key -W Secret_key  --region us-east-1 | grep INSTANCE | awk {'print $2'} >/ProdAMI/Prodinstances.txt
+
+for instances in $(cat /ProdAMI/Prodinstances.txt);do
+echo "Starting with Image creation"
+/usr/local/ec2/ec2-api-tools-1.7.5.0/bin/ec2-create-image $instances --no-reboot -name nightlysnaphot-$instances-`date +%m-%d` -O Access_key  -W Secret_key -region us-east-1
+echo "nightlysnaphot-$instances-`date +%m-%d` AMI's created successfully" >>/ProdAMI/AMIProd.txt
+done
+
+echo "checking for 3 days old AMI's"
+#Retrieving 3 days old AMI"s"
+/usr/local/ec2/ec2-api-tools-1.7.5.0/bin/ec2-describe-images -O Access_key -W Secret_key --region us-east-1 | grep `date +%m-%d --date '3 day ago'` | awk '{print $2}' > /ProdAMI/Prodpurge.txt
+#Retrieving snapshots
+for purge in $(cat /ProdAMI/Prodpurge.txt); do
+/usr/local/ec2/ec2-api-tools-1.7.5.0/bin/ec2-describe-images $purge -O Access_key -W Secret_key --region us-east-1 | awk {'print $4'} | grep snap >>/ProdAMI/Prodsnap.txt
+
+/usr/local/ec2/ec2-api-tools-1.7.5.0/bin/ec2-deregister $purge -O Access_key  -W Secret_key  --region us-east-1
+echo "Purge has been successfully completed.Deleting Associated snapshots"
+done
+
+for snap in $(cat /ProdAMI/Prodsnap.txt); do
+/usr/local/ec2/ec2-api-tools-1.7.5.0/bin/ec2-delete-snapshot $snap -O  Access_key -W Secret_key  --region us-east-1
+echo "Snapshots has been deleted successfully"
+done
+
+/usr/sbin/sendmail -v -i -t -f Mail_From <<END
+subject: Daily Unilever Prod  AMI Backup Status `date`
+to: Mail_to
+to: damodhar.takalkar@example.com
+`cat /ProdAMI/AMIProd.txt`
+END
+exit
