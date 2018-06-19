@@ -21,3 +21,8 @@ Import-Csv  "C:\Users\username\Desktop\User.csv" |
 
    New-ADUser @NewUserParams
    }
+
+
+CSV File
+Name	Firstname	Lastname	samAccountName	ParentOU	Password	TicketNo
+test	name		test	OU=MasterUsers,OU=test,DC=tre,DC=test,DC=COM	1234	tic234
