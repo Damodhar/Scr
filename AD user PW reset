@@ -1,0 +1,13 @@
+Import-Csv "C:\Users\username\Desktop\usereset.csv" |
+
+ForEach-Object {
+
+$samAccountName = $_."samAccountName"
+
+$newPassword = $_."Password"
+
+
+Set-ADAccountPassword -Identity $samAccountName -Reset -NewPassword (ConvertTo-SecureString -AsPlainText "$newPassword" -Force)
+Set-ADUser -Identity $samAccountName -PasswordNeverExpires $true
+
+}
