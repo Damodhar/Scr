@@ -1,0 +1,23 @@
+Import-Csv  "C:\Users\username\Desktop\User.csv" |
+ foreach {
+
+ $upn = $_."samAccountName" + "@domainname.com"
+
+   $NewUserParams = @{
+     Name                  = $_.Name
+     givenname             = $_.Firstname
+     surName               =$_.Lastname
+     displayName           = $_.Name
+     userprincipalname     = $upn
+     SamAccountName        = $_.samAccountName 
+     path                  = $_.ParentOU 
+     AccountPassword       =  ConvertTo-SecureString $_."Password" -AsPlainText -Force 
+     Enabled               =  $true 
+     ChangePasswordAtLogon =  $false 
+     email				   = $_.email
+	 PasswordNeverExpires  = $true
+	 Description           =$_.TicketNo
+    }
+
+   New-ADUser @NewUserParams
+   }
