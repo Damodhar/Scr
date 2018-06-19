@@ -1,0 +1,36 @@
+cat > /etc/dhcp/dhclient.conf << EOF
+supersede  domain-name "$DOMAIN" ;
+prepend domain-name-servers $DNS1, $DNS2 ;
+EOF
+
+
+
+wget http://pbis-open-8.3.0.3287.linux.x86_64.rpm.sh
+chmod a+x pbis-open-8.3.0.3287.linux.x86_64.rpm.sh
+yes yes | ./pbis-open-8.3.0.3287.linux.x86_64.rpm.sh --nox11 install
+/opt/pbis/bin/domainjoin-cli join $DOMAIN domain.join@$DOMAIN $DOMAINPASS
+
+/opt/pbis/bin/update-dns
+
+/opt/pbis/bin/update-dns
+
+
+rm -rf tmp/
+
+MOTD=/etc/motd
+rm -f $MOTD
+
+
+cat /etc/sudoers
+%domainname\\domain^admins         ALL=(ALL)       ALL
+
+#
+# Lock down AWS home directories.
+#
+
+/opt/pbis/bin/lwconfig HomeDirUmask 077
+chmod 700 /home/local/VPC/*
+chmod 1777 /tmp
+
+
+
